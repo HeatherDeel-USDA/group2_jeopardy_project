@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(readr)
 library(dplyr)
+library(tidyr)
 ```
 
 
@@ -21,12 +22,14 @@ library(dplyr)
 season1 <- read_tsv("season1.tsv")
 ```
 
+## Create new dataframe
 ```{r}
-season1_cat <- season1 %>% 
+season1_cat <- season1 %>%
   group_by(category) %>% 
   count() %>% 
   arrange(desc(n))
 ```
+
 
 
 
