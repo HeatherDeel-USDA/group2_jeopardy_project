@@ -1,0 +1,66 @@
+---
+title: "SAW_script_all_seasons"
+author: "Sere Williams"
+date: "11/27/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Research Question
+
+Our research question aims to ask which categories appear most often in the 35 seasons that Jeopardy has run. In this analysis, we will look at the top 5 most repeated categories and themes of the numerous categories that were only used once. To look at category themes, we will use a word search to group category types and isolate commonalities. Lastly, we will use a word search to identify current events and link the event to the season inwhich that category was used. 
+
+## Libraries
+```{r}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(stringr)
+```
+
+## Read in the data
+```{r}
+seasons_all <- read_tsv("master_season1-35.tsv")
+```
+
+## Create new dataframe with all seasons
+```{r}
+seasons_all_cat <- seasons_all %>%
+  group_by(category) %>% 
+  count() %>% 
+  arrange(desc(n))
+```
+
+
+
+## Visualize top five categories over all seasons
+We want to look at the distribution of repeated categories by season.
+```{r}
+seasons_all_cat_top5 <- seasons_all %>% 
+  mutate(category = str_to_lower(string = category)) %>% 
+  filter(category == "science" |
+         category == "literature" |
+         category == "american history" |
+         category == "history" |
+         category == "sports") %>% 
+  separate(air_date, sep="-", into = c("year", "month", "day"))
+  
+  
+
+
+```
+
+
+
+
+## Pick a category: "Stupid Questions"
+```{r}
+seasons_all_stu_Q <- 
+```
+
+
+
