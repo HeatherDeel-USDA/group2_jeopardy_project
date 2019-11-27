@@ -22,10 +22,12 @@ library(lubridate)
 library(stringr)
 ```
 
+
 ## Read in the data
 ```{r}
 seasons_all <- read_tsv("master_season1-35.tsv")
 ```
+
 
 ## Create new dataframe with all seasons
 ```{r}
@@ -36,31 +38,55 @@ seasons_all_cat <- seasons_all %>%
 ```
 
 
+## All seasons cleaned data
+```{r}
+seasons_all_clean <- seasons_all %>% 
+  separate(air_date, sep="-", into = c("year", "month", "day")) %>% 
+  select(-comments, -notes) %>% 
+  mutate(category = str_to_lower(string = category))
+
+```
+
+
+## Number of questions asked per season
+```{r}
+seasons_all_count <- seasons_all_clean %>% 
+  filter(year != ("2019")) %>% 
+  group_by(year) %>% 
+  count()
+```
+
+
 
 ## Visualize top five categories over all seasons
 We want to look at the distribution of repeated categories by season.
 ```{r}
-seasons_all_cat_top5 <- seasons_all %>% 
-  mutate(category = str_to_lower(string = category)) %>% 
+seasons_all_cat_top5 <- seasons_all_clean %>% 
   filter(category == "science" |
          category == "literature" |
          category == "american history" |
          category == "history" |
-         category == "sports") %>% 
-  separate(air_date, sep="-", into = c("year", "month", "day"))
-  
-  
+         category == "sports")
 
-
+top5_year_total <- seasons_all_cat_top5 %>% 
+  group_by(year) %>% 
+  count()
 ```
 
 
 
-
-## Pick a category: "Stupid Questions"
+## Question counts by category by year
 ```{r}
-seasons_all_stu_Q <- 
+top5_year_count <- seasons_all_cat_top5 %>% 
+  select(-answer, -question, -month, -day) %>% 
+  group_by(category, year) %>% 
+  tally() %>% 
+  arrange(year)
+  
 ```
 
 
+## relative abundance from heather
+
+percent_abundance = value / sum(value)*100
 
