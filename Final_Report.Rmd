@@ -18,7 +18,11 @@ Our research question aims to ask which categories appear most often in the 35 s
 library(readr)
 library(dplyr)
 library(tidyr)
+<<<<<<< HEAD
 library(lubridate)
+=======
+library(stringr)
+>>>>>>> 8f9b5d50a424523f9334c5815b00440ef26f461a
 ```
 
 ## Read in the data
@@ -53,5 +57,6 @@ seasons_all_cat_top5 <- seasons_all %>%
 ```{r}
 seasons_all_stu_Q <- 
 ```
+
 
 
