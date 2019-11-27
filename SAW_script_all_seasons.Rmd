@@ -20,6 +20,7 @@ library(dplyr)
 library(tidyr)
 library(lubridate)
 library(stringr)
+library(ggplot2)
 ```
 
 
@@ -43,7 +44,8 @@ seasons_all_cat <- seasons_all %>%
 seasons_all_clean <- seasons_all %>% 
   separate(air_date, sep="-", into = c("year", "month", "day")) %>% 
   select(-comments, -notes) %>% 
-  mutate(category = str_to_lower(string = category))
+  mutate(category = str_to_lower(string = category)) %>% 
+  filter(year != "2019")
 
 ```
 
@@ -51,7 +53,6 @@ seasons_all_clean <- seasons_all %>%
 ## Number of questions asked per season
 ```{r}
 seasons_all_count <- seasons_all_clean %>% 
-  filter(year != ("2019")) %>% 
   group_by(year) %>% 
   count()
 ```
@@ -86,7 +87,21 @@ top5_year_count <- seasons_all_cat_top5 %>%
 ```
 
 
-## relative abundance from heather
+## Plot the question counts by category by year
+good source for stacked bar charts: https://www.r-graph-gallery.com/48-grouped-barplot-with-ggplot2.html
+```{r fig.width = 8, fig.height = 4}
+top5_year_count_plot <- top5_year_count %>% 
+  ggplot(aes(x = year, y = n, fill = category)) +
+  geom_bar(position = "stack", stat = "identity") +
+  theme_bw() +
+  ggtitle("Counts of questions asked in top 5 categories by season") +
+  theme(axis.text.x = element_text(angle = 45))
 
+top5_year_count_plot
+
+```
+
+
+## relative abundance from heather
 percent_abundance = value / sum(value)*100
 
