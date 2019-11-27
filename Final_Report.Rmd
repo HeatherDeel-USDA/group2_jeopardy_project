@@ -13,4 +13,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Our research question aims to ask which categories appear most often in the 35 seasons that Jeopardy has run. In this analysis, we will look at the top 5 most repeated categories and themes of the numerous categories that were only used once. To look at category themes, we will use a word search to group category types and isolate commonalities. Lastly, we will use a word search to identify current events and link the event to the season inwhich that category was used. 
 
+## Loading libraries
+
+```{r}
+# Khum did..
+# loading libraries for whole analysis
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+
+```
+
 
