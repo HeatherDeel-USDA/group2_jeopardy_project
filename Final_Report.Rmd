@@ -18,6 +18,7 @@ Our research question aims to ask which categories appear most often in the 35 s
 library(readr)
 library(dplyr)
 library(tidyr)
+library(lubridate)
 ```
 
 ## Read in the data
@@ -34,5 +35,23 @@ seasons_all_cat <- seasons_all %>%
 ```
 
 
+
+## Visualize top five categories over all seasons
+We want to look at the distribution of repeated categories by season.
+```{r}
+seasons_all_cat_top5 <- seasons_all %>% 
+  select()
+  
+
+
+```
+
+
+
+
+## Pick a category: "Stupid Questions"
+```{r}
+seasons_all_stu_Q <- 
+```
 
 
