@@ -15,6 +15,7 @@ library(readr)
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(ggplot2)
 ```
 
 ## Read in the data
@@ -47,6 +48,22 @@ Question 2: How often does the mythology category appear over each year? Is ther
 ```{r}
 seasons_all_myth <- seasons_all_clean %>% 
   filter(category == "mythology")
+
+seasons_all_myth_year <- seasons_all_myth %>% 
+  group_by(year) %>% 
+  count()
+```
+
+## Plot mythology category by year
+```{r}
+seasons_all_myth_year %>% 
+  ggplot(aes(x = year, y = n)) +
+  geom_bar(stat = "identity", fill = "pink") +
+  theme_classic() +
+  ggtitle("Number of questions asked in the Mythology category by season") +
+  theme(axis.text.x = element_text(angle = 45)) +
+  labs(x = "Year", y = "Number of questions")
+  
 ```
 
 
