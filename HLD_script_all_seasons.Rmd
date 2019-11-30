@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(readr)
 library(dplyr)
 library(tidyr)
+library(stringr)
 ```
 
 ## Read in the data
@@ -28,4 +29,44 @@ seasons_all_cat <- seasons_all %>%
   count() %>% 
   arrange(desc(n))
 ```
+
+## Clean up seasons data
+
+```{r}
+seasons_all_clean <- seasons_all %>% 
+  separate(air_date, sep="-", into = c("year", "month", "day")) %>% 
+  select(-comments, -notes) %>% 
+  mutate(category = str_to_lower(string = category)) %>% 
+  filter(year != "2019")
+```
+
+
+Questions to answer:
+Question 2: How often does the mythology category appear over each year? Is there a trend in how often it occurs over time?
+
+```{r}
+seasons_all_myth <- seasons_all_clean %>% 
+  filter(category == "mythology")
+```
+
+
+Question 3: How often does “Athena”, the greek goddess of war, appear over time? Is there a trend?
+```{r}
+
+# note that with this code, it includes "Athena" not just in the mythology category - increases occurrences from 21 to 103
+
+seasons_all_athena <- seasons_all_clean %>% 
+  filter(str_detect(question, "Athena") | str_detect(answer, "Athena"))
+```
+
+
+
+# separate year column
+
+df %>%
+  separate(date, sep="-", into = c("year", "month", "day"))
+
+
+
+
 
