@@ -58,7 +58,7 @@ seasons_all_cat_top5 <- seasons_all %>%
 
 ## Pick a category: "Stupid Questions"
 ```{r}
-seasons_all_stu_Q <- 
+
 ```
 
 
