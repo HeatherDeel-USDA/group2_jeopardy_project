@@ -112,58 +112,94 @@ seasons_all_athena_cat %>%
 ## Filter to multiple greek gods in question and answer columns and group by year
 ```{r}
 
-greek_gods <- c("athena", "zeus", "poseidon", "hades", "hera")
+greek_gods <- c("athena", "zeus", "poseidon", "hades", "hera", "apollo", "demeter", "artemis", "aphrodite", "ares")
 
 seasons_all_greek <- seasons_all_clean %>% 
-  filter(str_detect(question, greek_gods) | str_detect(answer, greek_gods)) %>% 
-  group_by(category) %>% 
-  count()
+  filter(str_detect(question, greek_gods) | str_detect(answer, greek_gods))
 
 ```
 
 ## Norse
-odin, loki, thor, njord, heimdall
 ```{r}
-norse_gods <- c("odin", "loki", "thor", "njord", "heimdall")
+norse_gods <- c("odin", "loki", "thor", "njord", "heimdall", "frigg", "tyr", "baldur", "idun", "bragi")
 
 seasons_all_norse <- seasons_all_clean %>% 
-  filter(str_detect(question, norse_gods) | str_detect(answer, norse_gods)) %>% 
-  group_by(category) %>% 
-  count()
+  filter(str_detect(question, norse_gods) | str_detect(answer, norse_gods))
+```
+
+## Graph norse gods by category
+```{r}
+seasons_all_norse_top5 <- seasons_all_norse %>% 
+  filter(category == "authors" |
+         category == "books & authors" |
+         category == "literature" | 
+         category == "english literature" | 
+         category == "fictional characters")
+  
+
+seasons_all_norse_top5 %>%
+  ggplot(aes(x = reorder(category, -n), y = n)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  theme_classic() +
+  ggtitle("Number of times Norse Gods are mentioned in the question or answer") +
+  labs(x = "Category", y = "Number of mentions")
 ```
 
 
 ## Hindu
-vishnu, brahma, shiva, lakshmi, hanuman
 ```{r}
-hindu_gods <- c("vishnu", "brahma", "shiva", "lakshmi", "hanuman")
+hindu_gods <- c("vishnu", "brahma", "shiva", "lakshmi", "hanuman", "ganesha", "krishna", "kali", "rama", "saraswati")
 
 seasons_all_hindu <- seasons_all_clean %>% 
-  filter(str_detect(question, hindu_gods) | str_detect(answer, hindu_gods)) %>% 
-  group_by(category) %>% 
-  count()
+  filter(str_detect(question, hindu_gods) | str_detect(answer, hindu_gods))
 ```
 
-## All gods
+## Merga all 3 datasets
 ```{r}
-all_gods <- c("vishnu", "brahma", "shiva", "lakshmi", "hanuman", "odin", "loki", "thor", "njord", "heimdall", "athena", "zeus", "poseidon", "hades", "hera")
-
-seasons_all_gods <- seasons_all_clean %>% 
-  filter(str_detect(question, all_gods) | str_detect(answer, all_gods)) %>% 
-  group_by(category) %>% 
-  count()
+seasons_all_gods3 <- merge(merge(seasons_all_greek, seasons_all_norse, all = TRUE), seasons_all_hindu, all = TRUE)
 ```
 
-## Plot all gods by category
+## Group by category
 ```{r}
-seasons_all_gods %>% 
-  ggplot(aes(x = category, y = n)) +
-  geom_bar(stat = "identity", fill = "purple") +
+seasons_all_gods_cat <- seasons_all_gods3 %>% 
+  group_by(category) %>% 
+  count()
+
+seasons_all_gods_top5 <- seasons_all_gods_cat %>%
+    filter(category == "authors" |
+         category == "books & authors" |
+         category == "literature" | 
+         category == "mythology" | 
+         category == "english literature")
+  
+```
+
+## Now graph
+```{r}
+seasons_all_gods_top5 %>%
+  ggplot(aes(x = reorder(category, -n), y = n)) +
+  geom_bar(stat = "identity", fill = "blue") +
   theme_classic() +
-  ggtitle("Number of time all gods are mentioned in all categories") +
-  theme(axis.text.x = element_text(angle = 45)) +
+  ggtitle("Number of times all Gods are mentioned in the question or answer") +
   labs(x = "Category", y = "Number of mentions")
 ```
+
+### will maybe try to facet by god or something for another interesting figure
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
