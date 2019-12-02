@@ -105,9 +105,6 @@ top5_year_count_plot
 ```
 
 
-## relative abundance from heather
-percent_abundance = value / sum(value)*100
-
 ## Counts of questions fasceted by category
 ```{r}
 top5_year_count_plot <- top5_year_count %>% 
