@@ -184,7 +184,7 @@ seasons_all_gods_top5 %>%
   labs(x = "Category", y = "Number of mentions")
 ```
 
-
+### will maybe try to facet by god or something for another interesting figure
 
 
 
