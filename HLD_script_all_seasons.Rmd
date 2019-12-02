@@ -1,0 +1,31 @@
+---
+title: "Jeopardy Project All Seasons"
+author: "Heather Deel"
+date: "11/18/2019"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Libraries
+```{r}
+library(readr)
+library(dplyr)
+library(tidyr)
+```
+
+## Read in the data
+```{r}
+seasons_all <- read_tsv("master_season1-35.tsv")
+```
+
+## Create new dataframe with all seasons
+```{r}
+seasons_all_cat <- seasons_all %>%
+  group_by(category) %>% 
+  count() %>% 
+  arrange(desc(n))
+```
+

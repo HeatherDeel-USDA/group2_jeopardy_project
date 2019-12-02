@@ -22,7 +22,24 @@ library(dplyr)
 library(ggplot2)
 library(stringr)
 library(tidyr)
-
+library(readr)
 ```
+
+
+
+## Read in the data
+```{r}
+seasons_all <- read_tsv("master_season1-35.tsv")
+```
+
+## Create new dataframe with all seasons
+```{r}
+seasons_all_cat <- seasons_all %>%
+  group_by(category) %>% 
+  count() %>% 
+  arrange(desc(n))
+```
+
+
 
 
