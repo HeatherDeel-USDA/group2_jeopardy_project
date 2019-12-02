@@ -23,6 +23,7 @@ library(ggplot2)
 library(stringr)
 library(tidyr)
 library(readr)
+library(lubridate)
 ```
 
 
@@ -40,6 +41,25 @@ seasons_all_cat <- seasons_all %>%
   arrange(desc(n))
 ```
 
+
+
+## Visualize top five categories over all seasons
+We want to look at the distribution of repeated categories by season.
+```{r}
+seasons_all_cat_top5 <- seasons_all %>% 
+  select()
+  
+
+
+```
+
+
+
+
+## Pick a category: "Stupid Questions"
+```{r}
+seasons_all_stu_Q <- 
+```
 
 
 
