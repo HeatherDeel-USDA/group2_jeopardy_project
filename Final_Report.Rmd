@@ -5,7 +5,7 @@ date: "11/27/2019"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -13,17 +13,20 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Our research question aims to ask which categories appear most often in the 35 seasons that Jeopardy has run. In this analysis, we will look at the top 5 most repeated categories and themes of the numerous categories that were only used once. To look at category themes, we will use a word search to group category types and isolate commonalities. Lastly, we will use a word search to identify current events and link the event to the season inwhich that category was used. 
 
-## Libraries
+## Loading libraries
+
 ```{r}
-library(readr)
+# Khum did..
+# loading libraries for whole analysis
 library(dplyr)
-library(tidyr)
-<<<<<<< HEAD
-library(lubridate)
-=======
+library(ggplot2)
 library(stringr)
->>>>>>> 8f9b5d50a424523f9334c5815b00440ef26f461a
+library(tidyr)
+library(readr)
+library(lubridate)
 ```
+
+
 
 ## Read in the data
 ```{r}
@@ -55,7 +58,7 @@ seasons_all_cat_top5 <- seasons_all %>%
 
 ## Pick a category: "Stupid Questions"
 ```{r}
-seasons_all_stu_Q <- 
+
 ```
 
 
