@@ -1,0 +1,107 @@
+---
+title: "SAW_script_all_seasons"
+author: "Sere Williams"
+date: "11/27/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Research Question
+
+Our research question aims to ask which categories appear most often in the 35 seasons that Jeopardy has run. In this analysis, we will look at the top 5 most repeated categories and themes of the numerous categories that were only used once. To look at category themes, we will use a word search to group category types and isolate commonalities. Lastly, we will use a word search to identify current events and link the event to the season inwhich that category was used. 
+
+## Libraries
+```{r}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(stringr)
+library(ggplot2)
+```
+
+
+## Read in the data
+```{r}
+seasons_all <- read_tsv("master_season1-35.tsv")
+```
+
+
+## Create new dataframe with all seasons
+```{r}
+seasons_all_cat <- seasons_all %>%
+  group_by(category) %>% 
+  count() %>% 
+  arrange(desc(n))
+```
+
+
+## All seasons cleaned data
+```{r}
+seasons_all_clean <- seasons_all %>% 
+  separate(air_date, sep="-", into = c("year", "month", "day")) %>% 
+  select(-comments, -notes) %>% 
+  mutate(category = str_to_lower(string = category)) %>% 
+  filter(year != "2019")
+
+```
+
+
+## Number of questions asked per season
+```{r}
+seasons_all_count <- seasons_all_clean %>% 
+  group_by(year) %>% 
+  count()
+```
+
+
+
+## Visualize top five categories over all seasons
+We want to look at the distribution of repeated categories by season.
+```{r}
+seasons_all_cat_top5 <- seasons_all_clean %>% 
+  filter(category == "science" |
+         category == "literature" |
+         category == "american history" |
+         category == "history" |
+         category == "sports")
+
+top5_year_total <- seasons_all_cat_top5 %>% 
+  group_by(year) %>% 
+  count()
+```
+
+
+
+## Question counts by category by year
+```{r}
+top5_year_count <- seasons_all_cat_top5 %>% 
+  select(-answer, -question, -month, -day) %>% 
+  group_by(category, year) %>% 
+  tally() %>% 
+  arrange(year)
+  
+```
+
+
+## Plot the question counts by category by year
+good source for stacked bar charts: https://www.r-graph-gallery.com/48-grouped-barplot-with-ggplot2.html
+```{r fig.width = 8, fig.height = 4}
+top5_year_count_plot <- top5_year_count %>% 
+  ggplot(aes(x = year, y = n, fill = category)) +
+  geom_bar(position = "stack", stat = "identity") +
+  theme_bw() +
+  ggtitle("Counts of questions asked in top 5 categories by season") +
+  theme(axis.text.x = element_text(angle = 45))
+
+top5_year_count_plot
+
+```
+
+
+## relative abundance from heather
+percent_abundance = value / sum(value)*100
+
