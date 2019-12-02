@@ -146,3 +146,47 @@ prop_top5_plot
 
 ```
 
+
+
+## What were the top 5 most commonly asked categories from 1998 on?
+```{r}
+seasons_1998on_count <- seasons_all_clean %>% 
+  filter(year >= 1998) %>% 
+  group_by(category) %>% 
+  count() %>% 
+  arrange(desc(n))
+
+seasons_1998on_top5 <- seasons_all_clean %>% 
+  filter(year >= 1998) %>% 
+  filter(category == "before & after" |
+         category == "word origins" |
+         category == "american history" |
+         category == "potpourri" |
+         category == "literature")
+
+tally_1998on <- seasons_1998on_top5 %>% 
+  select(-answer, -question, -month, -day) %>% 
+  group_by(category, year) %>% 
+  tally() %>% 
+  arrange(year)
+
+tally_1998on_plot <- tally_1998on %>% 
+  ggplot(aes(x = year, y = n)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ category) +
+  theme_bw() +
+  ggtitle("Counts of questions asked in top 5 categories by season from 1998 on") +
+  theme(axis.text.x = element_text(angle = 45))
+
+tally_1998on_plot
+```
+
+
+
+
+
+
+
+
+
+
