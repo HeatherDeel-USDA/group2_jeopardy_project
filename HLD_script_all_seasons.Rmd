@@ -87,8 +87,20 @@ seasons_all_athena %>%
   
 ```
 
+### Do it with multiple greek gods
 
+## Filter to multiple greek gods in question and answer columns and group by year
+```{r}
 
+greek_gods <- c("Athena", "Zeus", "Poseidon", "Hades", "Hera")
 
+seasons_all_greek <- seasons_all_clean %>% 
+  filter(str_detect(question, greek_gods) | str_detect(answer, greek_gods))
+
+```
+
+## Norse
+
+## Roman
 
 
