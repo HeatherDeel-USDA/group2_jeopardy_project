@@ -36,7 +36,9 @@ seasons_all_cat <- seasons_all %>%
 seasons_all_clean <- seasons_all %>% 
   separate(air_date, sep="-", into = c("year", "month", "day")) %>% 
   select(-comments, -notes) %>% 
-  mutate(category = str_to_lower(string = category)) %>% 
+  mutate(category = str_to_lower(string = category)) %>%
+  mutate(answer = str_to_lower(string = answer)) %>% 
+  mutate(question = str_to_lower(string = question)) %>% 
   filter(year != "2019")
 ```
 
@@ -70,8 +72,14 @@ Question 3: How often does “Athena”, the greek goddess of war, appear over t
 # note that with this code, it includes "Athena" not just in the mythology category - increases occurrences from 21 to 103
 
 seasons_all_athena <- seasons_all_clean %>% 
-  filter(str_detect(question, "Athena") | str_detect(answer, "Athena")) %>% 
+  filter(str_detect(question, "athena") | str_detect(answer, "athena")) %>% 
   group_by(year) %>% 
+  count()
+
+# create dataframe without grouping to see what other categories are there
+seasons_all_athena_cat <- seasons_all_clean %>% 
+  filter(str_detect(question, "athena") | str_detect(answer, "athena")) %>% 
+  group_by(category) %>% 
   count()
 ```
 
@@ -87,8 +95,75 @@ seasons_all_athena %>%
   
 ```
 
+## Try plotting but by category
+```{r}
+seasons_all_athena_cat %>% 
+  ggplot(aes(x = category, y = n)) +
+  geom_bar(stat = "identity", fill = "purple") +
+  theme_classic() +
+  ggtitle("Number of times 'Athena' is mentioned in the question or answer") +
+  theme(axis.text.x = element_text(angle = 45)) +
+  labs(x = "Category", y = "Number of mentions")
+```
 
 
+### Do it with multiple greek gods
+
+## Filter to multiple greek gods in question and answer columns and group by year
+```{r}
+
+greek_gods <- c("athena", "zeus", "poseidon", "hades", "hera")
+
+seasons_all_greek <- seasons_all_clean %>% 
+  filter(str_detect(question, greek_gods) | str_detect(answer, greek_gods)) %>% 
+  group_by(category) %>% 
+  count()
+
+```
+
+## Norse
+odin, loki, thor, njord, heimdall
+```{r}
+norse_gods <- c("odin", "loki", "thor", "njord", "heimdall")
+
+seasons_all_norse <- seasons_all_clean %>% 
+  filter(str_detect(question, norse_gods) | str_detect(answer, norse_gods)) %>% 
+  group_by(category) %>% 
+  count()
+```
+
+
+## Hindu
+vishnu, brahma, shiva, lakshmi, hanuman
+```{r}
+hindu_gods <- c("vishnu", "brahma", "shiva", "lakshmi", "hanuman")
+
+seasons_all_hindu <- seasons_all_clean %>% 
+  filter(str_detect(question, hindu_gods) | str_detect(answer, hindu_gods)) %>% 
+  group_by(category) %>% 
+  count()
+```
+
+## All gods
+```{r}
+all_gods <- c("vishnu", "brahma", "shiva", "lakshmi", "hanuman", "odin", "loki", "thor", "njord", "heimdall", "athena", "zeus", "poseidon", "hades", "hera")
+
+seasons_all_gods <- seasons_all_clean %>% 
+  filter(str_detect(question, all_gods) | str_detect(answer, all_gods)) %>% 
+  group_by(category) %>% 
+  count()
+```
+
+## Plot all gods by category
+```{r}
+seasons_all_gods %>% 
+  ggplot(aes(x = category, y = n)) +
+  geom_bar(stat = "identity", fill = "purple") +
+  theme_classic() +
+  ggtitle("Number of time all gods are mentioned in all categories") +
+  theme(axis.text.x = element_text(angle = 45)) +
+  labs(x = "Category", y = "Number of mentions")
+```
 
 
 
