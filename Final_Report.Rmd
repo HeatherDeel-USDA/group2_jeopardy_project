@@ -1,7 +1,7 @@
 ---
 title: "Final Report"
 author: "Sere Williams", "Heather Deel", "Sunny Liu", "Kuhm Thapa-Magar"
-date: "11/27/2019"
+date: "12/13/2019"
 output: html_document
 ---
 
@@ -12,19 +12,18 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Research questions:
 Question 1: What are the top 5 categories in all seasons, and how often do these occur per year?
 Question 2: What are the top 5 categories that different kinds of gods (Greek, Norse, Hindu) are mentioned either in the question or answer?
-How often to the two popular Greek gods, Zeus and Athena, appear over time and in the top 5 categories discovered in question 2?
+Question 3: How often do the two popular Greek gods, Zeus and Athena, appear over time and in the top 5 categories discovered in question 2?
 
 # Loading libraries
 
 ```{r}
-# Khum did..
-# loading libraries for whole analysis
 library(dplyr)
 library(ggplot2)
 library(stringr)
 library(tidyr)
 library(readr)
 library(lubridate)
+library(forcats)
 ```
 
 
@@ -35,9 +34,9 @@ seasons_all <- read_tsv("master_season1-35.tsv")
 seasons_all_clean <- seasons_all %>% 
   separate(air_date, sep="-", into = c("year", "month", "day")) %>% 
   select(-comments, -notes) %>% 
-  mutate(category = str_to_lower(string = category)) %>%
-  mutate(answer = str_to_lower(string = answer)) %>% 
-  mutate(question = str_to_lower(string = question)) %>% 
+  mutate(category = str_to_lower(string = category),
+         answer = str_to_lower(string = answer),
+         question = str_to_lower(string = question)) %>% 
   filter(year != "2019")
 ```
 
@@ -71,7 +70,7 @@ seasons_all_hindu <- seasons_all_clean %>%
 seasons_all_gods <- merge(merge(seasons_all_greek, seasons_all_norse, all = TRUE), seasons_all_hindu, all = TRUE)
 ```
 
-# Group by category, filter by top 5 categories, and graph
+# Group by category, filter by top 5 categories
 ```{r}
 seasons_all_gods_cat <- seasons_all_gods %>% 
   group_by(category) %>% 
@@ -83,13 +82,6 @@ seasons_all_gods_top5 <- seasons_all_gods_cat %>%
          category == "literature" | 
          category == "mythology" | 
          category == "english literature")
-
-seasons_all_gods_top5 %>%
-  ggplot(aes(x = reorder(category, -n), y = n)) +
-  geom_bar(stat = "identity", fill = "blue") +
-  theme_classic() +
-  ggtitle("Number of times Greek, Norse, and Hindu Gods are mentioned") +
-  labs(x = "Category", y = "Number of mentions")
 ```
 
 ## Question 3: How often to the two popular Greek gods, Zeus and Athena, appear over time and in the top 5 categories discovered in question 2?
@@ -112,7 +104,7 @@ seasons_all_gods_ZA <- merge(merge(merge(seasons_all_gods_athenaQ, seasons_all_g
 ```
 
 # Fill by Zeus or Athena to look at their prevalences over time
-```{r}
+```{r fig.width = 4, fig.height = 2}
 seasons_all_gods_ZA_group <- seasons_all_gods_ZA %>% 
   group_by(category, year, god_name) %>% 
   count()
@@ -122,7 +114,7 @@ seasons_all_gods_ZA_group %>%
   geom_bar(position = "stack", stat = "identity") +
   theme_classic() +
   ggtitle("The prevalence of Zeus and Athena over time") +
-  theme(axis.text.x = element_text(angle = 45)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Year", y = "Number of mentions", fill = "God Name")
 
 ### note that this is testing the prevalence of Zeus and Athena out of all 15 tested gods from all categories
