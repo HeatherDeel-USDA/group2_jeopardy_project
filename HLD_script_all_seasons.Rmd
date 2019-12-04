@@ -59,7 +59,7 @@ seasons_all_myth %>%
   geom_bar(stat = "identity", fill = "pink") +
   theme_classic() +
   ggtitle("Number of questions asked in the Mythology category by season") +
-  theme(axis.text.x = element_text(angle = 45)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Year", y = "Number of questions")
   
 ```
@@ -90,7 +90,7 @@ seasons_all_athena %>%
   geom_bar(stat = "identity", fill = "purple") +
   theme_classic() +
   ggtitle("Number of times 'Athena' is mentioned in the question or answer") +
-  theme(axis.text.x = element_text(angle = 45)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Year", y = "Number of mentions")
   
 ```
@@ -102,7 +102,7 @@ seasons_all_athena_cat %>%
   geom_bar(stat = "identity", fill = "purple") +
   theme_classic() +
   ggtitle("Number of times 'Athena' is mentioned in the question or answer") +
-  theme(axis.text.x = element_text(angle = 45)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Category", y = "Number of mentions")
 ```
 
@@ -233,7 +233,7 @@ seasons_all_gods_ZAcat_group %>%
   geom_bar(position = "stack", stat = "identity") +
   theme_classic() +
   ggtitle("The prevalence of Zeus and Athena in questions and answers over time") +
-  theme(axis.text.x = element_text(angle = 45))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ### note that this is testing the prevalence of Zeus and Athena out of all 15 tested gods from all categories
 
