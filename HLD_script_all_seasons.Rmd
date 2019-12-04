@@ -16,6 +16,8 @@ library(dplyr)
 library(tidyr)
 library(stringr)
 library(ggplot2)
+library(forcats)
+library(RColorBrewer)
 ```
 
 ## Read in the data
@@ -222,14 +224,30 @@ seasons_all_gods_ZAcat <- merge(merge(merge(seasons_all_gods3_athenaQ, seasons_a
 
 ### Fill by god (Zeus or Athena) to look at their prevalences over time
 ```{r}
-seasons_all_gods_ZAcat_group <- seasons_all_gods_ZAcat %>% 
+seasons_all_gods_ZAcat_group <- seasons_all_gods_ZAcat %>%
   group_by(category, year, god_name) %>% 
   count()
 ```
 
+## Releveling
 ```{r}
-seasons_all_gods_ZAcat_group %>% 
+# make it so it says 'other'
+seasons_all_gods_ZAcat$god_name <- as.character(seasons_all_gods_ZAcat$god_name)
+seasons_all_gods_ZAcat$god_name[is.na(seasons_all_gods_ZAcat$god_name)] <- "other"
+
+seasons_all_gods_ZAcat$god_name <- as.factor(seasons_all_gods_ZAcat$god_name)
+
+seasons_all_gods_ZAcat$god_name <- relevel(seasons_all_gods_ZAcat$god_name, "other")
+```
+
+
+```{r}
+
+color_pal <- c("grey75", "tomato1", "royalblue1")
+
+seasons_all_gods_ZAcat_group %>%
   ggplot(aes(x = year, y = n, fill = god_name)) +
+  scale_fill_manual(values = color_pal) +
   geom_bar(position = "stack", stat = "identity") +
   theme_classic() +
   ggtitle("The prevalence of Zeus and Athena in questions and answers over time") +
@@ -264,12 +282,11 @@ seasons_all_gods_ZAcat_top5_group %>%
   theme_classic() +
   ggtitle("Number of times all Gods are mentioned in the question or answer") +
   labs(x = "Category", y = "Number of mentions")
+
+
+### use forcats to change 'NA' to 'other and reorder so that Zeus and Athena are on the bottom of the chart
+
 ```
-
-
-
-
-
 
 
 
