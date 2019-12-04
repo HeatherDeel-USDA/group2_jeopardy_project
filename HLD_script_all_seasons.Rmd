@@ -36,7 +36,9 @@ seasons_all_cat <- seasons_all %>%
 seasons_all_clean <- seasons_all %>% 
   separate(air_date, sep="-", into = c("year", "month", "day")) %>% 
   select(-comments, -notes) %>% 
-  mutate(category = str_to_lower(string = category)) %>% 
+  mutate(category = str_to_lower(string = category)) %>%
+  mutate(answer = str_to_lower(string = answer)) %>% 
+  mutate(question = str_to_lower(string = question)) %>% 
   filter(year != "2019")
 ```
 
@@ -57,7 +59,7 @@ seasons_all_myth %>%
   geom_bar(stat = "identity", fill = "pink") +
   theme_classic() +
   ggtitle("Number of questions asked in the Mythology category by season") +
-  theme(axis.text.x = element_text(angle = 45)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Year", y = "Number of questions")
   
 ```
@@ -70,8 +72,14 @@ Question 3: How often does “Athena”, the greek goddess of war, appear over t
 # note that with this code, it includes "Athena" not just in the mythology category - increases occurrences from 21 to 103
 
 seasons_all_athena <- seasons_all_clean %>% 
-  filter(str_detect(question, "Athena") | str_detect(answer, "Athena")) %>% 
+  filter(str_detect(question, "athena") | str_detect(answer, "athena")) %>% 
   group_by(year) %>% 
+  count()
+
+# create dataframe without grouping to see what other categories are there
+seasons_all_athena_cat <- seasons_all_clean %>% 
+  filter(str_detect(question, "athena") | str_detect(answer, "athena")) %>% 
+  group_by(category) %>% 
   count()
 ```
 
@@ -82,17 +90,29 @@ seasons_all_athena %>%
   geom_bar(stat = "identity", fill = "purple") +
   theme_classic() +
   ggtitle("Number of times 'Athena' is mentioned in the question or answer") +
-  theme(axis.text.x = element_text(angle = 45)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Year", y = "Number of mentions")
   
 ```
+
+## Try plotting but by category
+```{r}
+seasons_all_athena_cat %>% 
+  ggplot(aes(x = category, y = n)) +
+  geom_bar(stat = "identity", fill = "purple") +
+  theme_classic() +
+  ggtitle("Number of times 'Athena' is mentioned in the question or answer") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = "Category", y = "Number of mentions")
+```
+
 
 ### Do it with multiple greek gods
 
 ## Filter to multiple greek gods in question and answer columns and group by year
 ```{r}
 
-greek_gods <- c("Athena", "Zeus", "Poseidon", "Hades", "Hera")
+greek_gods <- c("athena", "zeus", "poseidon", "hades", "hera", "apollo", "demeter", "artemis", "aphrodite", "ares")
 
 seasons_all_greek <- seasons_all_clean %>% 
   filter(str_detect(question, greek_gods) | str_detect(answer, greek_gods))
@@ -100,7 +120,157 @@ seasons_all_greek <- seasons_all_clean %>%
 ```
 
 ## Norse
+```{r}
+norse_gods <- c("odin", "loki", "thor", "njord", "heimdall", "frigg", "tyr", "baldur", "idun", "bragi")
 
-## Roman
+seasons_all_norse <- seasons_all_clean %>% 
+  filter(str_detect(question, norse_gods) | str_detect(answer, norse_gods))
+```
+
+## Graph norse gods by category
+```{r}
+seasons_all_norse_top5 <- seasons_all_norse %>% 
+  filter(category == "authors" |
+         category == "books & authors" |
+         category == "literature" | 
+         category == "english literature" | 
+         category == "fictional characters") %>% 
+  group_by(category) %>% 
+  count()
+  
+
+seasons_all_norse_top5 %>%
+  ggplot(aes(x = reorder(category, -n), y = n)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  theme_classic() +
+  ggtitle("Number of times Norse Gods are mentioned in the question or answer") +
+  labs(x = "Category", y = "Number of mentions")
+```
+
+
+## Hindu
+```{r}
+hindu_gods <- c("vishnu", "brahma", "shiva", "lakshmi", "hanuman", "ganesha", "krishna", "kali", "rama", "saraswati")
+
+seasons_all_hindu <- seasons_all_clean %>% 
+  filter(str_detect(question, hindu_gods) | str_detect(answer, hindu_gods))
+```
+
+### Try adding column for god name
+```{r}
+seasons_all_hindu_name <- seasons_all_clean %>% 
+  filter(str_detect(question, hindu_gods) | str_detect(answer, hindu_gods)) %>% 
+  mutate(god_name = stringr::str_extract(question, "vishnu"))
+  
+  
+```
+
+
+## Merga all 3 datasets
+```{r}
+seasons_all_gods3 <- merge(merge(seasons_all_greek, seasons_all_norse, all = TRUE), seasons_all_hindu, all = TRUE)
+```
+
+## Group by category
+```{r}
+seasons_all_gods_cat <- seasons_all_gods3 %>% 
+  group_by(category) %>% 
+  count()
+
+seasons_all_gods_top5 <- seasons_all_gods_cat %>%
+    filter(category == "authors" |
+         category == "books & authors" |
+         category == "literature" | 
+         category == "mythology" | 
+         category == "english literature")
+  
+```
+
+## Now graph
+```{r}
+seasons_all_gods_top5 %>%
+  ggplot(aes(x = reorder(category, -n), y = n)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  theme_classic() +
+  ggtitle("Number of times all Gods are mentioned in the question or answer") +
+  labs(x = "Category", y = "Number of mentions")
+```
+
+### will maybe try to facet by god or something for another interesting figure
+
+### In depth analysis of gods and their prevalence in certain categories
+
+### create columns for Zeus and Athena
+
+```{r}
+seasons_all_gods3_athenaQ <- seasons_all_gods3 %>% 
+  mutate(god_name = stringr::str_extract(question, "athena"))
+
+seasons_all_gods3_athenaA <- seasons_all_gods3 %>% 
+  mutate(god_name = stringr::str_extract(answer, "athena"))
+
+seasons_all_gods3_zeusQ <- seasons_all_gods3 %>% 
+  mutate(god_name = stringr::str_extract(question, "zeus"))
+
+seasons_all_gods3_zeusA <- seasons_all_gods3 %>% 
+  mutate(god_name = stringr::str_extract(answer, "zeus"))
+
+seasons_all_gods_ZAcat <- merge(merge(merge(seasons_all_gods3_athenaQ, seasons_all_gods3_athenaA, all = TRUE), seasons_all_gods3_zeusQ, all = TRUE), seasons_all_gods3_zeusA, all = TRUE)
+
+```
+
+
+### Fill by god (Zeus or Athena) to look at their prevalences over time
+```{r}
+seasons_all_gods_ZAcat_group <- seasons_all_gods_ZAcat %>% 
+  group_by(category, year, god_name) %>% 
+  count()
+```
+
+```{r}
+seasons_all_gods_ZAcat_group %>% 
+  ggplot(aes(x = year, y = n, fill = god_name)) +
+  geom_bar(position = "stack", stat = "identity") +
+  theme_classic() +
+  ggtitle("The prevalence of Zeus and Athena in questions and answers over time") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+### note that this is testing the prevalence of Zeus and Athena out of all 15 tested gods from all categories
+
+```
+
+
+### Then filter to the top 5 categories (authors, books & authors, literature, mythology, english literature, and fill by god)
+
+```{r}
+seasons_all_gods_ZAcat_top5 <- seasons_all_gods_ZAcat %>%
+      filter(category == "authors" |
+         category == "books & authors" |
+         category == "literature" | 
+         category == "mythology" | 
+         category == "english literature")
+
+seasons_all_gods_ZAcat_top5_group <- seasons_all_gods_ZAcat_top5 %>% 
+  group_by(category, year, god_name) %>% 
+  count()
+  
+```
+
+
+```{r}
+seasons_all_gods_ZAcat_top5_group %>%
+  ggplot(aes(x = reorder(category, -n), y = n, fill = god_name)) +
+  geom_bar(stat = "identity") +
+  theme_classic() +
+  ggtitle("Number of times all Gods are mentioned in the question or answer") +
+  labs(x = "Category", y = "Number of mentions")
+```
+
+
+
+
+
+
+
 
 
