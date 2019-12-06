@@ -1,8 +1,10 @@
 ---
 title: "Final Report"
-author: "Sere Williams", "Heather Deel", "Sunny Liu", "Kuhm Thapa-Magar"
+author: "group"
 date: "12/13/2019"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=TRUE}
@@ -10,12 +12,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Research questions:
-Question 1: What are the top 5 categories in all seasons, and how often do these occur per year?
-Question 2: What are the top 5 categories that different kinds of gods (Greek, Norse, Hindu) are mentioned either in the question or answer?
-Question 3: How often do the two popular Greek gods, Zeus and Athena, appear over time and in the top 5 categories discovered in question 2?
+
+Our research question aims to ask which categories appear most often in the 35 seasons that Jeopardy has run and if the top 5 categories have changed over time. Next we look at which categories different groups of gods appear in, and how often Zeus and Athena appear in thoes categories. 
+
+#Our three questions are:
+
+Question 1: What are the top 5 categories in all seasons, and how often do these occur per year?  
+
+Question 2: What are the top 5 categories that different kinds of gods (Greek, Norse, Hindu) are mentioned either in the question or answer?  
+
+Question 3: How often do the two popular Greek gods, Zeus and Athena, appear over time and in the top 5 categories discovered in question 2?  
+
+## To begin we need to load libraries, load the data, and clean the data. 
 
 # Loading libraries
-
 ```{r}
 library(dplyr)
 library(ggplot2)
@@ -27,25 +37,163 @@ library(forcats)
 ```
 
 
-
 # Read in and clean the data
+We read in the data and clean it by separating the air date into three columns, removing comments and notes, changing text to all lower case letters and removing data from 2019 as the season is only partially complete. 
 ```{r}
 seasons_all <- read_tsv("master_season1-35.tsv")
+
 seasons_all_clean <- seasons_all %>% 
   separate(air_date, sep="-", into = c("year", "month", "day")) %>% 
   select(-comments, -notes) %>% 
   mutate(category = str_to_lower(string = category),
          answer = str_to_lower(string = answer),
          question = str_to_lower(string = question)) %>% 
-  filter(year != "2019")
+  filter(year != "2019") 
+
+seasons_all_clean_count <- seasons_all_clean %>%
+  nrow()
+```
+
+## Question 1: What are the top 5 categories in all seasons, and how often do these occur per year?
+
+# Look at the occurance of categories over all seasons
+```{r}
+seasons_all_cat <- seasons_all %>%
+  group_by(category) %>% 
+  count() %>% 
+  arrange(desc(n))
+
+seasons_all_cat_count <- seasons_all_cat %>% 
+  nrow()
+
+seasons_all_cat1 <- seasons_all_cat %>% 
+  filter(n == 1) %>% 
+  nrow()
+
+seasons_all_cat2 <- seasons_all_cat %>% 
+  filter(n <= 12) %>% 
+  nrow()
+
+questions_per_category <- (seasons_all_cat_count/seasons_all_clean_count)*100
+```
+In 34 seasons (excluding 2019), 341,807 questions were asked and 43,369 different categories were used. On average, there were 12.68 questions per category, however, 1606 categories were only used once, and 39,863 categories were used less than 12 times.  
+
+See these lists of categories here:
+#####
+Add these dataframes into the flexdashboard.
+#####
+
+# Visualize the occurance of the top five categories over all seasons
+```{r}
+# filter data to only top 5 categories
+seasons_all_cat_top5 <- seasons_all_clean %>% 
+  filter(category == "science" |
+         category == "literature" |
+         category == "american history" |
+         category == "history" |
+         category == "sports")
+
+# count total questions asked in top 5 categories over all years
+top5_year_count <- seasons_all_cat_top5 %>% 
+  select(-answer, -question, -month, -day) %>% 
+  group_by(category, year) %>% 
+  tally() %>% 
+  arrange(year)
+  
+# filter data to only top5 categories
+seasons_all_cat_top5 <- seasons_all_clean %>% 
+  filter(category == "science" |
+         category == "literature" |
+         category == "american history" |
+         category == "history" |
+         category == "sports")
+
+top5_year_total <- seasons_all_cat_top5 %>% 
+  group_by(year) %>% 
+  count()
+  
+# counts of questions fasceted by category
+top5_year_count_plot <- top5_year_count %>% 
+  ggplot(aes(x = year, y = n)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ category) +
+  theme_classic() +
+  ggtitle("Counts of questions asked in the top five categories by season") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = "Year", y = "Number of questions asked") +
+  scale_x_discrete(breaks=seq(1980, 2015, 5))
+  
+
+top5_year_count_plot
+```
+
+# What is the proportion of questions from the top 5 categories by year?
+```{r}
+# total number of questions asked per season
+seasons_all_count <- seasons_all_clean %>% 
+  group_by(year) %>% 
+  count()
+
+# proportion of questions which are in top 5 categories by year
+prop_top5 <- top5_year_count %>% 
+  full_join(seasons_all_count, top5_year_count, by = "year") %>% 
+  rename("count" = "n.x") %>% 
+  rename("total" = "n.y") %>% 
+  mutate(proportion = (count/total)*1000)
+
+prop_top5_plot <- prop_top5 %>%
+  ggplot(aes(x = year, y = proportion, fill = category)) +
+  geom_bar(position = "stack", stat = "identity") +
+  theme_classic() +
+  ggtitle("Proportion of questions asked from the top five \ncategories (x1000) by season") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = "Year", y = "Proportion", fill = "Category") +
+  scale_x_discrete(breaks=seq(1980, 2015, 5))
+
+prop_top5_plot
+```
+
+
+# Did the top 5 most commonly used categories change after 1997?
+```{r}
+seasons_1998on_count <- seasons_all_clean %>% 
+  filter(year >= 1998) %>% 
+  group_by(category) %>% 
+  count() %>% 
+  arrange(desc(n))
+
+seasons_1998on_top5 <- seasons_all_clean %>% 
+  filter(year >= 1998) %>% 
+  filter(category == "before & after" |
+         category == "word origins" |
+         category == "american history" |
+         category == "potpourri" |
+         category == "literature")
+
+tally_1998on <- seasons_1998on_top5 %>% 
+  select(-answer, -question, -month, -day) %>% 
+  group_by(category, year) %>% 
+  tally() %>% 
+  arrange(year)
+
+tally_1998on_plot <- tally_1998on %>% 
+  ggplot(aes(x = year, y = n)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ category) +
+  theme_bw() +
+  ggtitle("Counts of questions asked in the top five categories \nby season from 1998 on") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = "Year", y = "Number of questions asked") +
+  scale_x_discrete(breaks=seq(2000, 2015, 5))
+
+tally_1998on_plot
 ```
 
 
 
-## Question 1: What are the top 5 categories in all seasons, and how often do these occur per year?
-######################################
-######### SERE PUT CODE HERE
-######################################
+
+
+
 
 ## Question 2: What are the top 5 categories that different kinds of gods (Greek, Norse, Hindu) are mentioned either in the question or answer?
 
