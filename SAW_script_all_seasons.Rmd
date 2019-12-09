@@ -11,9 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Research Question
 
-Our research question aims to ask which categories appear most often in the 35 seasons that Jeopardy has run and within a category, how often do some words appear. In this analysis, we will look at the top 5 most repeated categories. Next we ask how often "Athena" or "Zeus" appear in the question or answer and in which categories gods occur. 
-Our three questions are:
-
+Our research question aims to ask which categories appear most often in the 35 seasons that Jeopardy has run. In this analysis, we will look at the top 5 most repeated categories and themes of the numerous categories that were only used once. To look at category themes, we will use a word search to group category types and isolate commonalities. Lastly, we will use a word search to identify current events and link the event to the season inwhich that category was used. 
 
 ## Libraries
 ```{r}
@@ -23,7 +21,6 @@ library(tidyr)
 library(lubridate)
 library(stringr)
 library(ggplot2)
-library(forcats)
 ```
 
 
@@ -33,7 +30,7 @@ seasons_all <- read_tsv("master_season1-35.tsv")
 ```
 
 
-# Look at the occurance of categories over all seasons
+## Create new dataframe with all seasons
 ```{r}
 seasons_all_cat <- seasons_all %>%
   group_by(category) %>% 
@@ -64,6 +61,7 @@ seasons_all_count <- seasons_all_clean %>%
 ```
 
 
+
 ## Visualize top five categories over all seasons
 We want to look at the distribution of repeated categories by season.
 ```{r}
@@ -81,7 +79,7 @@ top5_year_total <- seasons_all_cat_top5 %>%
 
 
 
-## Count total questions asked in top 5 categories over all years
+## Question counts by category by year
 ```{r}
 top5_year_count <- seasons_all_cat_top5 %>% 
   select(-answer, -question, -month, -day) %>% 
@@ -94,14 +92,13 @@ top5_year_count <- seasons_all_cat_top5 %>%
 
 ## Plot the question counts by category by year
 Source for stacked bar charts: https://www.r-graph-gallery.com/48-grouped-barplot-with-ggplot2.html
-```{r fig.width = 4, fig.height = 2}
+```{r fig.width = 8, fig.height = 4}
 top5_year_count_plot <- top5_year_count %>% 
   ggplot(aes(x = year, y = n, fill = category)) +
   geom_bar(position = "stack", stat = "identity") +
-  theme_classic() +
-  ggtitle("Number of questions asked in top 5 categories by season") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(x = "Year", y = "Number of questions asked")
+  theme_bw() +
+  ggtitle("Counts of questions asked in top 5 categories by season") +
+  theme(axis.text.x = element_text(angle = 45))
 
 top5_year_count_plot
 
@@ -116,8 +113,7 @@ top5_year_count_plot <- top5_year_count %>%
   facet_wrap(~ category) +
   theme_classic() +
   ggtitle("Counts of questions asked in top 5 categories by season") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(y = "Number of questions asked")
+  theme(axis.text.x = element_text(angle = 45))
 
 top5_year_count_plot
 ```
@@ -138,8 +134,7 @@ prop_top5_plot <- prop_top5 %>%
   geom_bar(position = "stack", stat = "identity") +
   theme_classic() +
   ggtitle("Proportion of questions asked from top 5 categories (x1000) by season") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(x = "Year", y = "Proportion", fill = "Category")
+  theme(axis.text.x = element_text(angle = 45))
 
 prop_top5_plot
 
@@ -150,7 +145,7 @@ prop_top5_plot
 
 
 
-## Did the top 5 most commonly used categories change after 1997?
+## What were the top 5 most commonly asked categories from 1998 on?
 ```{r}
 seasons_1998on_count <- seasons_all_clean %>% 
   filter(year >= 1998) %>% 
@@ -178,7 +173,7 @@ tally_1998on_plot <- tally_1998on %>%
   facet_wrap(~ category) +
   theme_bw() +
   ggtitle("Counts of questions asked in top 5 categories by season from 1998 on") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45))
 
 tally_1998on_plot
 ```
