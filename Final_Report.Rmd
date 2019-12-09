@@ -276,12 +276,21 @@ seasons_all_gods_ZA <- merge(merge(merge(seasons_all_gods_athenaQ, seasons_all_g
 
 ## Fill by Zeus or Athena to look at their prevalences over time
 ```{r }
+# Relevel and change NA to other
 seasons_all_gods_ZA_group <- seasons_all_gods_ZA %>% 
   group_by(category, year, god_name) %>% 
   count()
 
+seasons_all_gods_ZA_group$god_name <- as.character(seasons_all_gods_ZA_group$god_name)
+seasons_all_gods_ZA_group$god_name[is.na(seasons_all_gods_ZA_group$god_name)] <- "other"
+seasons_all_gods_ZA_group$god_name <- as.factor(seasons_all_gods_ZA_group$god_name)
+seasons_all_gods_ZA_group$god_name <- relevel(seasons_all_gods_ZA_group$god_name, "other")
+
+color_pal <- c("grey75", "tomato1", "royalblue1")
+
 seasons_all_gods_ZA_group %>% 
   ggplot(aes(x = year, y = n, fill = god_name)) +
+  scale_fill_manual(values = color_pal) +
   geom_bar(position = "stack", stat = "identity") +
   theme_classic() +
   ggtitle("The prevalence of Zeus and Athena over time") +
