@@ -1,39 +1,36 @@
 ---
-title: "Untitled"
+title: "Focal Chart (Top)"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
-    vertical_layout: fill
+    orientation: rows
 ---
+    
+Row {data-height=650}
+-------------------------------------
 
-```{r setup, include=FALSE}
-library(flexdashboard)
-```
-
-Column {data-width=650}
------------------------------------------------------------------------
-
-### Chart A
+### Chart 1
 
 ```{r}
-##libraries
+library(plotly)
+
+p <- plot_ly(data = iris, x = ~Sepal.Length, y = ~Petal.Length)
+p
+
+```
+
+Row {data-height=350}
+-------------------------------------
+   
+### Chart 2
+
+```{r}
 plot(cars$dist)
-
-```
-
-Column {data-width=350}
------------------------------------------------------------------------
-
-### Chart B
+```   
+    
+### Chart 3
 
 ```{r}
-plot(cars$speed)
+library(DT)
+k<- table(mtcars$cyl)
+datatable(mtcars)
 ```
-
-### Chart C
-
-```{r}
-table(cars$dist)
-
-```
-
