@@ -217,13 +217,6 @@ tally_1998on_plot <- tally_1998on %>%
   labs(x = "Year", y = "Number of questions asked") 
 ```
 
-
-
-## Question 1: What are the top 5 categories in all seasons, and how often do these occur per year?
-######################################
-######### SERE PUT CODE HERE
-######################################
-
 ## Question 2: What are the top 5 categories that different kinds of gods (Greek, Norse, Hindu) are mentioned either in the question or answer?
 
 ## Create dataframe filtered by different kinds of gods, all merged into one dataframe
