@@ -1,0 +1,35 @@
+---
+title: "KM_all_season"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+jeo <- read_tsv("master_season1-35.tsv")
+View(jeo)
+```
+
+```{r}
+# just want to look the number of categories in the data sets
+all_cat <- jeo %>%
+  group_by(category) %>%
+  count() %>%
+  arrange(desc(n))
+all_cat
+
+dim(all_cat)
+```
+# let's filter the data by mythiology category
+
+```{r}
+myth <- jeo %>%
+  filter(category=="MYTHOLOGY")
+dim(myth)
+View(myth)
+
+```
+
