@@ -2,9 +2,11 @@
 title: "Flexdashboard"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
-    vertical_layout: fill
+    orientation: rows
 ---
+
+Row 
+-------------------------------------
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
