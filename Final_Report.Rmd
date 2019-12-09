@@ -309,12 +309,18 @@ seasons_all_gods_ZA_top5 <- seasons_all_gods_ZA %>%
          category == "mythology" | 
          category == "english literature")
 
+seasons_all_gods_ZA_top5$god_name <- as.character(seasons_all_gods_ZA_top5$god_name)
+seasons_all_gods_ZA_top5$god_name[is.na(seasons_all_gods_ZA_top5$god_name)] <- "other"
+seasons_all_gods_ZA_top5$god_name <- as.factor(seasons_all_gods_ZA_top5$god_name)
+seasons_all_gods_ZA_top5$god_name <- relevel(seasons_all_gods_ZA_top5$god_name, "other")
+
 seasons_all_gods_ZA_top5_group <- seasons_all_gods_ZA_top5 %>% 
   group_by(category, year, god_name) %>% 
   count()
 
 seasons_all_gods_ZA_top5_group %>%
   ggplot(aes(x = reorder(category, -n), y = n, fill = god_name)) +
+  scale_fill_manual(values = color_pal) +
   geom_bar(stat = "identity") +
   theme_classic() +
   ggtitle("Number of times Zeus and Athena are mentioned in the most popular categories") +
