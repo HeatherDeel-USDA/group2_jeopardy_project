@@ -10,7 +10,6 @@ Row
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
-
 ```
 
 ## Research questions:
