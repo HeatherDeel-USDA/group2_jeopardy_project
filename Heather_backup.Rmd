@@ -1,0 +1,199 @@
+---
+title: "Heather_backup"
+author: "Sere Williams"
+date: "12/9/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 2: What are the top 5 categories that different kinds of gods (Greek, Norse, Hindu) are mentioned either in the question or answer?
+226
+228
+227
+229
+## Create dataframe filtered by different kinds of gods, all merged into one dataframe
+228
+230
+```{r}
+ 
+ 
+@@ -276,38 +278,26 @@ seasons_all_gods_zeusA <- seasons_all_gods %>% 
+Unstage chunk	
+ 
+276
+278
+  mutate(god_name = stringr::str_extract(answer, "zeus"))
+277
+279
+278
+280
+seasons_all_gods_ZA <- merge(merge(merge(seasons_all_gods_athenaQ, seasons_all_gods_athenaA, all = TRUE), seasons_all_gods_zeusQ, all = TRUE), seasons_all_gods_zeusA, all = TRUE)
+279
+281
+```
+280
+282
+ 
+283
+281
+284
+## Fill by Zeus or Athena to look at their prevalences over time
+282
+285
+```{r }
+283
+ 
+284
+286
+seasons_all_gods_ZA_group <- seasons_all_gods_ZA %>% 
+285
+287
+  group_by(category, year, god_name) %>% 
+286
+288
+  count()
+287
+289
+288
+ 
+# Relevel and change NA to 'other'
+289
+ 
+seasons_all_gods_ZA_group$god_name <- as.character(seasons_all_gods_ZA_group$god_name)
+290
+ 
+seasons_all_gods_ZA_group$god_name[is.na(seasons_all_gods_ZA_group$god_name)] <- "other"
+291
+ 
+292
+ 
+seasons_all_gods_ZA_group$god_name <- as.factor(seasons_all_gods_ZA_group$god_name)
+293
+ 
+294
+ 
+seasons_all_gods_ZA_group$god_name <- relevel(seasons_all_gods_ZA_group$god_name, "other")
+295
+ 
+296
+ 
+color_pal <- c("grey75", "tomato1", "royalblue1")
+297
+ 
+298
+290
+seasons_all_gods_ZA_group %>% 
+299
+291
+  ggplot(aes(x = year, y = n, fill = god_name)) +
+300
+ 
+  scale_fill_manual(values = color_pal) +
+301
+292
+  geom_bar(position = "stack", stat = "identity") +
+302
+293
+  theme_classic() +
+303
+294
+  ggtitle("The prevalence of Zeus and Athena over time") +
+304
+295
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+305
+296
+  labs(x = "Year", y = "Number of mentions", fill = "God Name")
+306
+297
+307
+298
+### note that this is testing the prevalence of Zeus and Athena out of all 15 tested gods from all categories
+308
+ 
+309
+299
+```
+310
+300
+311
+301
+## Filter the ZA dataframe to top 5 categories and fill by Zeus or Athena
+312
+302
+```{r}
+313
+303
+seasons_all_gods_ZA_top5 <- seasons_all_gods_ZA %>%
+ 
+ 
+@@ -319,27 +309,16 @@ seasons_all_gods_ZA_top5 <- seasons_all_gods_ZA %>% 
+Unstage chunk	
+ 
+319
+309
+320
+310
+seasons_all_gods_ZA_top5_group <- seasons_all_gods_ZA_top5 %>% 
+321
+311
+  group_by(category, year, god_name) %>% 
+322
+312
+  count()
+323
+313
+324
+ 
+# Relevel and change NA to 'other'
+325
+ 
+seasons_all_gods_ZA_top5_group$god_name <- as.character(seasons_all_gods_ZA_top5_group$god_name)
+326
+ 
+seasons_all_gods_ZA_top5_group$god_name[is.na(seasons_all_gods_ZA_top5_group$god_name)] <- "other"
+327
+ 
+328
+ 
+seasons_all_gods_ZA_top5_group$god_name <- as.factor(seasons_all_gods_ZA_top5_group$god_name)
+329
+ 
+330
+ 
+seasons_all_gods_ZA_top5_group$god_name <- relevel(seasons_all_gods_ZA_top5_group$god_name, "other")
+331
+ 
+332
+ 
+333
+314
+seasons_all_gods_ZA_top5_group %>%
+334
+315
+  ggplot(aes(x = reorder(category, -n), y = n, fill = god_name)) +
+335
+ 
+  scale_fill_manual(values = color_pal) +
+336
+316
+  geom_bar(stat = "identity") +
+337
+317
+  theme_classic() +
+338
+318
+  ggtitle("Number of times Zeus and Athena are mentioned in the most popular categories") +
+339
+319
+  labs(x = "Category", y = "Number of mentions", fill = "God Name")
+340
+ 
+341
+320
+```
+342
+321

@@ -1,0 +1,149 @@
+---
+title: "Flexdashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+Row 
+-------------------------------------
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+## Research questions:
+Question 1: What are the top 5 categories in all seasons, and how often do these occur per year?
+Question 2: What are the top 5 categories that different kinds of gods (Greek, Norse, Hindu) are mentioned either in the question or answer?
+How often to the two popular Greek gods, Zeus and Athena, appear over time and in the top 5 categories discovered in question 2?
+
+# Loading libraries
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+library(readr)
+library(lubridate)
+```
+
+# Read in and clean the data
+
+
+```{r}
+seasons_all <- read_tsv("master_season1-35.tsv")
+seasons_all_clean <- seasons_all %>% 
+  separate(air_date, sep="-", into = c("year", "month", "day")) %>% 
+  select(-comments, -notes) %>% 
+  mutate(category = str_to_lower(string = category)) %>%
+  mutate(answer = str_to_lower(string = answer)) %>% 
+  mutate(question = str_to_lower(string = question)) %>% 
+  filter(year != "2019")
+```
+
+## Question 1: What are the top 5 categories in all seasons, and how often do these occur per year?
+######################################
+######### SERE PUT CODE HERE
+######################################
+
+## Question 2: What are the top 5 categories that different kinds of gods (Greek, Norse, Hindu) are mentioned either in the question or answer?
+
+# Create dataframe filtered by different kinds of gods, all merged into one dataframe
+```{r}
+# Create lists of gods
+greek_gods <- c("athena", "zeus", "poseidon", "hades", "hera", "apollo", "demeter", "artemis", "aphrodite", "ares")
+norse_gods <- c("odin", "loki", "thor", "njord", "heimdall", "frigg", "tyr", "baldur", "idun", "bragi")
+hindu_gods <- c("vishnu", "brahma", "shiva", "lakshmi", "hanuman", "ganesha", "krishna", "kali", "rama", "saraswati")
+
+# Create filtered datasets for each type of god
+seasons_all_greek <- seasons_all_clean %>% 
+  filter(str_detect(question, greek_gods) | str_detect(answer, greek_gods))
+
+seasons_all_norse <- seasons_all_clean %>% 
+  filter(str_detect(question, norse_gods) | str_detect(answer, norse_gods))
+
+seasons_all_hindu <- seasons_all_clean %>% 
+  filter(str_detect(question, hindu_gods) | str_detect(answer, hindu_gods))
+
+# Merge all 3 dataframes
+seasons_all_gods <- merge(merge(seasons_all_greek, seasons_all_norse, all = TRUE), seasons_all_hindu, all = TRUE)
+```
+# Group by category, filter by top 5 categories, and graph
+
+```{r}
+seasons_all_gods_cat <- seasons_all_gods %>% 
+  group_by(category) %>% 
+  count()
+
+seasons_all_gods_top5 <- seasons_all_gods_cat %>%
+    filter(category == "authors" | 
+         category == "books & authors" |
+         category == "literature" | 
+         category == "mythology" | 
+         category == "english literature")
+
+seasons_all_gods_top5 %>%
+  ggplot(aes(x = reorder(category, -n), y = n)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  theme_classic() +
+  ggtitle("Number of times Greek, Norse, and Hindu Gods are mentioned") +
+  labs(x = "Category", y = "Number of mentions")
+```
+
+## Question 3: How often to the two popular Greek gods, Zeus and Athena, appear over time and in the top 5 categories discovered in question 2?
+
+# Create a god_name column that specifies whether Zeus or Athena was mentioned in the question or answer
+```{r}
+seasons_all_gods_athenaQ <- seasons_all_gods %>% 
+  mutate(god_name = stringr::str_extract(question, "athena"))
+
+seasons_all_gods_athenaA <- seasons_all_gods %>% 
+  mutate(god_name = stringr::str_extract(answer, "athena"))
+
+seasons_all_gods_zeusQ <- seasons_all_gods %>% 
+  mutate(god_name = stringr::str_extract(question, "zeus"))
+
+seasons_all_gods_zeusA <- seasons_all_gods %>% 
+  mutate(god_name = stringr::str_extract(answer, "zeus"))
+
+seasons_all_gods_ZA <- merge(merge(merge(seasons_all_gods_athenaQ, seasons_all_gods_athenaA, all = TRUE), seasons_all_gods_zeusQ, all = TRUE), seasons_all_gods_zeusA, all = TRUE)
+```
+
+# Fill by Zeus or Athena to look at their prevalences over time
+```{r}
+seasons_all_gods_ZA_group <- seasons_all_gods_ZA %>% 
+  group_by(category, year, god_name) %>% 
+  count()
+
+seasons_all_gods_ZA_group %>% 
+  ggplot(aes(x = year, y = n, fill = god_name)) +
+  geom_bar(position = "stack", stat = "identity") +
+  theme_classic() +
+  ggtitle("The prevalence of Zeus and Athena over time") +
+  theme(axis.text.x = element_text(angle = 45)) +
+  labs(x = "Year", y = "Number of mentions", fill = "God Name")
+
+### note that this is testing the prevalence of Zeus and Athena out of all 15 tested gods from all categories
+```
+
+# Filter the ZA dataframe to top 5 categories and fill by Zeus or Athena
+```{r}
+seasons_all_gods_ZA_top5 <- seasons_all_gods_ZA %>%
+      filter(category == "authors" |
+         category == "books & authors" |
+         category == "literature" | 
+         category == "mythology" | 
+         category == "english literature")
+
+seasons_all_gods_ZA_top5_group <- seasons_all_gods_ZA_top5 %>% 
+  group_by(category, year, god_name) %>% 
+  count()
+
+seasons_all_gods_ZA_top5_group %>%
+  ggplot(aes(x = reorder(category, -n), y = n, fill = god_name)) +
+  geom_bar(stat = "identity") +
+  theme_classic() +
+  ggtitle("Number of times Zeus and Athena are mentioned in the most popular categories") +
+  labs(x = "Category", y = "Number of mentions", fill = "God Name")
+```
