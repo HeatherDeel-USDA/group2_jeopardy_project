@@ -1,0 +1,199 @@
+---
+title: "Final Report"
+author: "Sere Williams, Heather Deel, Sunny Liu, Khum Thapa-Magar"
+date: "12/13/2019"
+output:
+  html_document: default
+---
+
+```{r setup, include=TRUE, echo=FALSE }
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, error = FALSE)
+```
+
+
+### Introduction
+When we load in the raw data, we found that a lot of categories keeps showing up within different seasons. Which makes us be curious about the frequency of how different categories show up, and what’s the top5 categories that show up in the most of times. And then there are some “biology ” in our group, and we are curious about the mythology topic, we want to explore that category in depth, then we decided to search for some god names, that would be fun. While we try to work on the top 5 categories, we found an interesting phenomenon that before and after 1998, there is a huge drop on the question numbers, which let us assume if there is any limitation happened since 1998, and we have a figure to show that interesting phenomenon
+
+### Research questions:
+
+Our research question aims to ask which categories appear most often in the 35 seasons that Jeopardy has run and if the top 5 categories have changed over time. Next we look at the most common categories that certain gods appear in, with some more in depth analysis of Zeus and Athena within these categories.
+
+### Our two questions are:
+
+Question 1: What are the top 5 categories in all seasons, and how often do these occur per year?  
+
+Question 2: What are the top 5 categories that different kinds of gods (Greek, Norse, Hindu) are mentioned either in the question or answer? How often are the popular Greek gods, Zeus and Athena, mentioned over time and within each of these categories?
+
+
+```{r}
+
+## To begin we need to load libraries, load the data, and clean the data. 
+
+## Loading libraries
+
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+library(readr)
+library(lubridate)
+library(forcats)
+library(DT)
+library(plotly)
+library(knitr)
+```
+
+
+### Methods:
+
+We read in the data and clean it by separating the air date into three columns, removing comments and notes, changing text to all lower case letters and removing data from 2019 as the season is only partially complete. 
+
+Methods: How did you investigate the data to try to answer your question? This should not include R code (save that for the tutorial part), but rather should use language like “To determine if … was associated with …, we measured the correlation …”. It’s fine for this project if the Methods are fairly simple (“We investigated the distribution of … using boxplots …”, “We took the mean and interquartile range of …”, “We mapped state-level averages of …”, etc.). Why do you choose to use the Methods you used? Why do you think they’re appropriate and useful for your project?
+-We cleaned the data by seperating the air date into three columns, and removed comments and notes. Then we checked the dataframe, and look at the occurancy of categories over all seasons by doing group_by and filtering. And then we visualized the occurance of the  top5 categories by making a plot showing the counts of questions asked in the top five categories. 
+- to explore further for the top5 ,  we made a plot to show the proportion of top 5 by year/season. In this plot we found that there is a huge drop for the total counts of questions been asked.
+- To explore our second question about the god names, we created dataframe filtered by different kinds of god (Greek, Norse, Hindu)), and then merge them into one dataframe. 
+
+
+
+## RESULT
+
+###### Answer to question01
+
+```{r}
+
+seasons_all <- read_tsv("master_season1-35.tsv")
+seasons_all_clean <- seasons_all %>% 
+  separate(air_date, sep="-", into = c("year", "month", "day")) %>% 
+  select(-comments, -notes) %>% 
+  mutate(category = str_to_lower(string = category),
+         answer = str_to_lower(string = answer),
+         question = str_to_lower(string = question)) %>% 
+  filter(year != "2019")
+```
+
+
+
+```{r,fig.width=5, fig.heigth=3}
+### Top five categories of 
+cat_pro <- seasons_all_clean %>%
+  mutate(category = fct_lump(category, n=5)) %>% # Making lumpsum
+  group_by(year, category) %>%
+  summarise(count = n())%>%
+  mutate(freq= count/sum(count)*100) %>%
+  filter(category!="Other") %>% #removed Other because of large proportion
+  ggplot()+
+  geom_bar(aes(x = year, y= freq, fill= category), stat="identity")+
+  theme(axis.text.x = element_text(angle = 45))+
+  scale_x_discrete(breaks = seq(1984, 2018, 4))+
+  #scale_y_continuous(labels=percent)+
+  labs(x = "Year", y = "Proportion (%)") +
+  theme_classic() +
+  ggtitle("Proportion of questions asked from the top five \ncategories by season")
+
+cat_pro <- ggplotly(cat_pro) 
+
+cat_pro
+```
+  
+####### Result to queation 01_a
+  
+```{r}
+sea_98<- seasons_all_clean %>%
+  mutate(b_logi = year<1998,
+         a_logi = year>=1998) %>%
+  group_by(category)%>%
+  summarise(before_98= sum(b_logi),
+            after_98=sum(a_logi)) %>%
+  arrange(desc(before_98)) %>%
+  head(n=5)
+kable(sea_98)
+
+```
+
+###### Answer to Question02
+
+```{r}
+# Create lists of gods
+greek_gods <- c("athena", "zeus", "poseidon", "hades", "hera", "apollo", "demeter", "artemis", "aphrodite", "ares")
+norse_gods <- c("odin", "loki", "thor", "njord", "heimdall", "frigg", "tyr", "baldur", "idun", "bragi")
+hindu_gods <- c("vishnu", "brahma", "shiva", "lakshmi", "hanuman", "ganesha", "krishna", "kali", "rama", "saraswati")
+
+# Create filtered datasets for each type of god
+seasons_all_greek <- seasons_all_clean %>% 
+  filter(str_detect(question, greek_gods) | str_detect(answer, greek_gods))
+
+seasons_all_norse <- seasons_all_clean %>% 
+  filter(str_detect(question, norse_gods) | str_detect(answer, norse_gods))
+
+seasons_all_hindu <- seasons_all_clean %>% 
+  filter(str_detect(question, hindu_gods) | str_detect(answer, hindu_gods))
+
+# Merge all 3 dataframes
+seasons_all_gods <- merge(merge(seasons_all_greek, seasons_all_norse, all = TRUE), seasons_all_hindu, all = TRUE)
+```
+
+
+```{r}
+seasons_all_gods_cat <- seasons_all_gods %>% 
+  group_by(category) %>% 
+  count()
+
+seasons_all_gods_top5 <- seasons_all_gods_cat %>%
+    filter(category == "authors" |
+         category == "books & authors" |
+         category == "literature" | 
+         category == "mythology" | 
+         category == "english literature")
+```
+
+
+```{r}
+seasons_all_gods_athenaQ <- seasons_all_gods %>% 
+  mutate(god_name = stringr::str_extract(question, "athena"))
+
+seasons_all_gods_athenaA <- seasons_all_gods %>% 
+  mutate(god_name = stringr::str_extract(answer, "athena"))
+
+seasons_all_gods_zeusQ <- seasons_all_gods %>% 
+  mutate(god_name = stringr::str_extract(question, "zeus"))
+
+seasons_all_gods_zeusA <- seasons_all_gods %>% 
+  mutate(god_name = stringr::str_extract(answer, "zeus"))
+
+seasons_all_gods_ZA <- merge(merge(merge(seasons_all_gods_athenaQ, seasons_all_gods_athenaA, all = TRUE), seasons_all_gods_zeusQ, all = TRUE), seasons_all_gods_zeusA, all = TRUE)
+```
+
+## Fill by Zeus or Athena to look at their prevalences over time
+```{r, eval=TRUE, fig.width=5, fig.heigth=3}
+# Relevel and change NA to other
+seasons_all_gods_ZA_group <- seasons_all_gods_ZA %>% 
+  group_by(category, year, god_name) %>% 
+  count()
+
+seasons_all_gods_ZA_group$god_name <- as.character(seasons_all_gods_ZA_group$god_name)
+seasons_all_gods_ZA_group$god_name[is.na(seasons_all_gods_ZA_group$god_name)] <- "other"
+seasons_all_gods_ZA_group$god_name <- as.factor(seasons_all_gods_ZA_group$god_name)
+seasons_all_gods_ZA_group$god_name <- relevel(seasons_all_gods_ZA_group$god_name, "other")
+
+color_pal <- c("grey75", "tomato1", "royalblue1")
+
+g<- seasons_all_gods_ZA_group %>% 
+  ggplot(aes(x = year, y = n, fill = god_name)) +
+  scale_fill_manual(values = color_pal) +
+  geom_bar(position = "stack", stat = "identity") +
+  theme_classic() +
+  ggtitle("The prevalence of Zeus and Athena over time") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = "Year", y = "Number of mentions", fill = "God Name")+ scale_x_discrete(breaks = seq(1984, 2018, 4))
+
+
+g
+
+```
+
+### Discussion
+
+
+
+### Conclusion
+

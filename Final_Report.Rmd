@@ -1,13 +1,13 @@
 ---
 title: "Final Report"
-author: "Sere Williams, Heather Deel, Sunny Liu, Kuhm Thapa-Magar"
+author: "Sere Williams, Heather Deel, Sunny Liu, Khum Thapa-Magar"
 date: "12/13/2019"
 output:
   html_document: default
 ---
 
-```{r setup, include=TRUE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, error = FALSE)
+```{r setup, include=TRUE }
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, error = FALSE)
 ```
 
 ## Research questions:
