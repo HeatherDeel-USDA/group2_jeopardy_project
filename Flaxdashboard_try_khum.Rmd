@@ -1,36 +1,110 @@
 ---
-title: "Focal Chart (Top)"
+title: "Gene Expression Biclustering"
+author: "Bryan Lewis"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
+    social: menu
+    source_code: embed
+runtime: shiny
 ---
-    
-Row {data-height=650}
--------------------------------------
-
-### Chart 1
 
 ```{r}
-library(plotly)
-
-p <- plot_ly(data = iris, x = ~Sepal.Length, y = ~Petal.Length)
-p
-
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(tidyr)
+library(readr)
+library(lubridate)
+library(forcats)
+library(DT)
 ```
 
-Row {data-height=350}
--------------------------------------
-   
-### Chart 2
 
 ```{r}
-plot(cars$dist)
-```   
+jeo <- read_tsv("C:/Users/khumbdr/Desktop/master_season1-35.tsv.txt")
+
+seasons_all <- read_tsv("master_season1-35.tsv")
+seasons_all_clean <- jeo %>% 
+  separate(air_date, sep="-", into = c("year", "month", "day")) %>% 
+  select(-comments, -notes) %>% 
+  mutate(category = str_to_lower(string = category),
+         answer = str_to_lower(string = answer),
+         question = str_to_lower(string = question)) %>% 
+  filter(year != "2019")
+  mutate(category1 = fct_lump(category, n=5))
+```
+
+
+```{r global, include=FALSE}
+### Top five categories of 
+  
+cat_pro <- seasons_all_clean %>%
+  mutate(category = fct_lump(category, n=5)) %>% # Making lumpsum
+  group_by(year, category) %>%
+  summarise(count = n())%>%
+  mutate(freq= count/sum(count)) %>%
+  filter(category!="Other") %>% #removed Other because of large proportion
+  ggplot()+
+  geom_bar(aes(x = year, y= freq, fill= category), stat="identity")+
+  theme(axis.text.x = element_text(angle = 45))+
+  scale_x_discrete(breaks = c(1984,1988,1992,1996,2000,2004,2008,2012,2016,2018))
+
+cat_pro
+```
+
+Inputs {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+ selectInput("clusterNum", label = h3("Cluster number"), 
+    choices = list("1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5), 
+    selected = 1)
+```
+
+Microarray data matrix for 80 experiments with Saccharomyces Cerevisiae
+organism extracted from R's `biclust` package.
+
+Sebastian Kaiser, Rodrigo Santamaria, Tatsiana Khamiakova, Martin Sill, Roberto
+  Theron, Luis Quintales, Friedrich Leisch and Ewoud De Troyer. (2015). biclust:
+  BiCluster Algorithms. R package version 1.2.0.
+  http://CRAN.R-project.org/package=biclust
+
+Row
+-----------------------------------------------------------------------
+
+### Heatmap
     
-### Chart 3
+```{r}
+
+num <- reactive(as.integer(input$clusterNum))
+
+col = colorRampPalette(c("red", "white", "darkblue"), space="Lab")(10)
+renderPlot({
+    p = par(mai=c(0,0,0,0))
+    heatmapBC(BicatYeast, res, number=num(), xlab="", ylab="",
+      order=TRUE, useRaster=TRUE, col=col)
+    par(p)
+})
+```
+
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### Parallel Coordinates
+    
+```{r}
+renderPlot(
+  parallelCoordinates(BicatYeast, res, number=num())
+)
+```
+   
+### Data for Selected Cluster
 
 ```{r}
-library(DT)
-k<- table(mtcars$cyl)
-datatable(mtcars)
+# only display table for values in cluster 4
+renderTable(
+  BicatYeast[which(res@RowxNumber[, num()]), which(res@NumberxCol[num(), ])]
+)
 ```

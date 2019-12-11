@@ -296,7 +296,6 @@ seasons_all_gods_ZA_group %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(x = "Year", y = "Number of mentions", fill = "God Name")
 
-### note that this is testing the prevalence of Zeus and Athena out of all 15 tested gods from all categories
 ```
 The plot shows that both Zeus and Athena consistently show up in either the answer or question over time, with Athena appearing ~20 times while Zeus appeared ~33 times. While neither appear at all in some years, in others they appear as many as 5 times, with the most popularity within the late 90s and early 2000s. 
 
