@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "The proportion of categories and in depth analysis of Zeus and Athena over time"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
@@ -85,7 +85,8 @@ seasons_all_gods_ZA <- merge(merge(merge(seasons_all_gods_athenaQ, seasons_all_g
 
 ```{r}
 # Relevel and change NA to other
-seasons_all_gods_ZA_group <- seasons_all_gods_ZA %>% 
+seasons_all_gods_ZA_group <- seasons_all_gods_ZA %>%
+  mutate(god_name = str_to_title(string = god_name)) %>% 
   group_by(category, year, god_name) %>% 
   count()
 
@@ -95,6 +96,7 @@ seasons_all_gods_ZA_group$god_name <- as.factor(seasons_all_gods_ZA_group$god_na
 seasons_all_gods_ZA_group$god_name <- relevel(seasons_all_gods_ZA_group$god_name, "other")
 
 color_pal <- c("grey75", "tomato1", "royalblue1")
+
 ```
 
 
@@ -105,8 +107,10 @@ library(flexdashboard)
 Column {data-width=650}
 -----------------------------------------------------------------------
 
-### Top category in Jeopardy
-
+### Proportion of questions asked from the top five categories by season
+Our group was interested in looking at the proportions of the top categories from all seasons of Jeopardy. The below graph shows how the proportions of the top 5 categories changed per each year, with a steep drop around 1998. 
+The table shows the prevalence of all categories before and after 1998, as well as the proportions for each out of the total number of times that category appeared.
+Our group was then interested in analyzing how often popular Greek gods, Zeus and Athena, appeared over time. These data comprise how much 'Zeus' and 'Athena' appear in either the question or answer. This is out of a subset of Jeopardy data, created by pulling together rows that contain popular Greek, Norse, and Hindu gods. 
 ```{r}
 ### Top five categories of 
   
@@ -122,8 +126,7 @@ cat_pro <- seasons_all_clean %>%
   scale_x_discrete(breaks = seq(1984, 2018, 4))+
   #scale_y_continuous(labels=percent)+
   labs(x = "Year", y = "Proportion (%)") +
-  theme_classic() +
-  ggtitle("Proportion of questions asked from the top five \ncategories by season")
+  theme_classic()
 
 cat_pro <- ggplotly(cat_pro) 
 
@@ -133,8 +136,7 @@ cat_pro
 Column {data-width=350}
 -----------------------------------------------------------------------
 
-### Chart B
-
+### Top categories before and after 1998
 ```{r}
 sea_98<- seasons_all_clean %>%
   mutate(b_logi = year<1998,
@@ -142,24 +144,28 @@ sea_98<- seasons_all_clean %>%
   group_by(category)%>%
   summarise(before_98= sum(b_logi),
             after_98=sum(a_logi)) %>%
-  arrange(desc(before_98)) %>%
-  head(n=50)
+  mutate(Proportion_before = before_98/(before_98 + after_98),
+         Proportion_after = after_98/(before_98 + after_98),
+         Proportion_before = round(Proportion_before, 3),
+         Proportion_after = round(Proportion_after, 3)) %>% 
+  arrange(desc(before_98))
+
+colnames(sea_98) <- c("Category", "Before 98", "After 98", "Proportion Before", "Proportion After")
+
 datatable(sea_98)
 ```
 
-### Chart C
-
+### The prevalence of Zeus and Athena over time
 ```{r}
 god<-seasons_all_gods_ZA_group %>% 
   ggplot(aes(x = year, y = n, fill = god_name)) +
   scale_fill_manual(values = color_pal) +
   geom_bar(position = "stack", stat = "identity") +
   theme_classic() +
-  ggtitle("The prevalence of Zeus and Athena over time") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(x = "Year", y = "Number of mentions", fill = "God Name")+
+  labs(x = "Year", y = "Number of mentions", fill = "God Name") +
     scale_x_discrete(breaks = seq(1984, 2018, 4))
-ggplotly(god)
 
+ggplotly(god)
 ```
 
