@@ -11,14 +11,15 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, error = FA
 ```
 
 
-### Introduction
-When we load in the raw data, we found that a lot of categories keeps showing up within different seasons. Which makes us be curious about the frequency of how different categories show up, and what’s the top5 categories that show up in the most of times. And then there are some “biology ” in our group, and we are curious about the mythology topic, we want to explore that category in depth, then we decided to search for some god names, that would be fun. While we try to work on the top 5 categories, we found an interesting phenomenon that before and after 1998, there is a huge drop on the question numbers, which let us assume if there is any limitation happened since 1998, and we have a figure to show that interesting phenomenon
+##### INTRODUCTION
 
-### Research questions:
+When we load in the raw data, we found that a lot of categories keeps showing up within different seasons. Which makes us be curious about the frequency of how different categories show up, and what’s the top5 categories that show up in the most of times. And then there are some “biology ” in our group, and we are curious about the mythology topic, we want to explore that category in depth, then we decided to search for some god names, that would be fun. While we try to work on the top 5 categories, we found an interesting phenomenon that before and after 1998, there is a huge drop on the question numbers, which let us assume if there is any limitation happened since 1998, and we have a figure to show that interesting phenomenon.
+
+**Research questions**
 
 Our research question aims to ask which categories appear most often in the 35 seasons that Jeopardy has run and if the top 5 categories have changed over time. Next we look at the most common categories that certain gods appear in, with some more in depth analysis of Zeus and Athena within these categories.
 
-### Our two questions are:
+**Following are our two questions are**
 
 Question 1: What are the top 5 categories in all seasons, and how often do these occur per year?  
 
@@ -41,23 +42,36 @@ library(forcats)
 library(DT)
 library(plotly)
 library(knitr)
+library(broom)
 ```
 
 
-### Methods:
+##### METHODS
+**Data collection**
+Data were collected from the github of following link:https://github.com/legacybass/Jeopardy. The data was as original was in the form of tab deliminated. We save the raw data in our subdirectory of group project directory.
 
-We read in the data and clean it by separating the air date into three columns, removing comments and notes, changing text to all lower case letters and removing data from 2019 as the season is only partially complete. 
+**Methods for first second question**
 
-Methods: How did you investigate the data to try to answer your question? This should not include R code (save that for the tutorial part), but rather should use language like “To determine if … was associated with …, we measured the correlation …”. It’s fine for this project if the Methods are fairly simple (“We investigated the distribution of … using boxplots …”, “We took the mean and interquartile range of …”, “We mapped state-level averages of …”, etc.). Why do you choose to use the Methods you used? Why do you think they’re appropriate and useful for your project?
--We cleaned the data by seperating the air date into three columns, and removed comments and notes. Then we checked the dataframe, and look at the occurancy of categories over all seasons by doing group_by and filtering. And then we visualized the occurance of the  top5 categories by making a plot showing the counts of questions asked in the top five categories. 
-- to explore further for the top5 ,  we made a plot to show the proportion of top 5 by year/season. In this plot we found that there is a huge drop for the total counts of questions been asked.
-- To explore our second question about the god names, we created dataframe filtered by different kinds of god (Greek, Norse, Hindu)), and then merge them into one dataframe. 
+ **Data cleaning**
+ We cleaned the data by seperating the air date into three columns, and removed comments and notes. Then we checked the dataframe, and look at the occurancy of categories over all seasons by doing group_by and filtering. We did mutation function in category variables to create logical vectors to estimate top five category used in geopardy. 
+
+**ploting top five category in jeopardy episods**
+
+And then we visualized the occurance of the  top5 categories by making a plot showing the counts of questions asked in the top five categories. we made a plot to show the proportion of top 5 by year/season using ggplot2
 
 
+**Zheus and Athena occurance in episods**
 
-## RESULT
+Our group was interested in looking at the prevalence of certain Greek gods over time, and we also incorporated Norse and Hindu gods as well to see if there was an overlap in categories that they occurred in. Ten of the most popular Greek, Norse, and Hindu gods were used to create separate lists. Str_detect was then used to detect these gods within either the question or answer columns, and all three resulting dataframes were merged together to create one dataframe with all questions/answers that mentioned any of the 15 gods. 
 
-###### Answer to question01
+To explore our second question about the god names, we created dataframe filtered by different kinds of god (Greek, Norse, Hindu)), and then merge them into one dataframe. 
+
+After grouping by category and taking the count of each, the dataframe with all gods was filtered down to just to top 5 categories - "Authors", "Books & Authors", "Literature", "Mythology", and "English Literature". 
+
+**Software and packages**
+We used R free software version of 3.60 for all of the analysis. We used R packages of "dplyr", "ggplot2", "tidyr", "stringr","DT", "plotly" etc as per needed in the analysis.
+
+##### RESULT
 
 ```{r}
 
@@ -71,9 +85,11 @@ seasons_all_clean <- seasons_all %>%
   filter(year != "2019")
 ```
 
+**Top 5 categories in all seasons**
 
+In this plot we found that there is a huge drop for the total counts of questions been asked.As the plot shows, there is a change in the proportion of questions asked from the top five categories after 1997.
 
-```{r,fig.width=5, fig.heigth=3}
+```{r,fig.width=8, fig.heigth=3}
 ### Top five categories of 
 cat_pro <- seasons_all_clean %>%
   mutate(category = fct_lump(category, n=5)) %>% # Making lumpsum
@@ -90,13 +106,16 @@ cat_pro <- seasons_all_clean %>%
   theme_classic() +
   ggtitle("Proportion of questions asked from the top five \ncategories by season")
 
-cat_pro <- ggplotly(cat_pro) 
-
 cat_pro
 ```
   
-####### Result to queation 01_a
+**Top five category before and after 1998** 
+
+As the table shows, two of the top five categories from all seasons are also in the top five categories from 1998-2018: american history and literature. Science appears at #6, however history and sports are not even in the top 10. From 1998-2018, history is the 31st most asked category and sports is 81st (not on the top 50 list).  
   
+Before & after, word origins, and potpourri are now in the top five. Note that these three categories were in the top 10 categories of all seasons. 
+
+
 ```{r}
 sea_98<- seasons_all_clean %>%
   mutate(b_logi = year<1998,
@@ -104,13 +123,21 @@ sea_98<- seasons_all_clean %>%
   group_by(category)%>%
   summarise(before_98= sum(b_logi),
             after_98=sum(a_logi)) %>%
-  arrange(desc(before_98)) %>%
-  head(n=5)
+  arrange(desc(before_98))%>%
+  head(5)
 kable(sea_98)
 
+
+
+```
+Statistical test also shows the significant difference in the average number of questions asked before and after 1998 in the program.
+
+```{r}
+# comparing differnece in question before and afte 1998
+jeo_t <- t.test(sea_98$before_98, sea_98$after_98)
+tidy(jeo_t)
 ```
 
-###### Answer to Question02
 
 ```{r}
 # Create lists of gods
@@ -163,8 +190,11 @@ seasons_all_gods_zeusA <- seasons_all_gods %>%
 seasons_all_gods_ZA <- merge(merge(merge(seasons_all_gods_athenaQ, seasons_all_gods_athenaA, all = TRUE), seasons_all_gods_zeusQ, all = TRUE), seasons_all_gods_zeusA, all = TRUE)
 ```
 
-## Fill by Zeus or Athena to look at their prevalences over time
-```{r, eval=TRUE, fig.width=5, fig.heigth=3}
+**Appearance of Zeus and Athena over episods**
+
+The plot shows that both Zeus and Athena consistently show up in either the answer or question over time, with Athena appearing ~20 times while Zeus appeared ~33 times. While neither appear at all in some years, in others they appear as many as 5 times, with the most popularity within the late 90s and early 2000s. 
+
+```{r, eval=TRUE, fig.width=8, fig.heigth=3}
 # Relevel and change NA to other
 seasons_all_gods_ZA_group <- seasons_all_gods_ZA %>% 
   group_by(category, year, god_name) %>% 
@@ -191,9 +221,15 @@ g
 
 ```
 
-### Discussion
+##### DISCUSSION
+We found american history, history, literature, science and sports as top category asked in Jeopardy all the season. Proportion of question in each top top category also seems varying in each season for example quesition in sports seems clear dropping. Beside this, overall, in all category questions seems huge droppping after year of 1998. It is difficult to answer why is happening this but possible hypothesis would be trying to make program interesting by incorporation of new categories with different interesting questions. For examples, the femine, the elephant etc. Participant may be smart on old categories. So, they came with new questions to ask. 
 
+We found that Zeus and Ahena consistently showing up in most of the episodes. Most dominant year was aroun 1996 to 2002. The plot shows that both Zeus and Athena consistently show up in either the answer or question over time, with Athena appearing ~20 times while Zeus appeared ~33 times. While neither appear at all in some years, in others they appear as many as 5 times, with the most popularity within the late 90s and early 2000s.
+Possilbe reasons..if any..
 
+##### CONCLUSION
+The american history, history, literature, science and sports as top category asked in Jeopardy all the season.
 
-### Conclusion
+There was clear drop in the relative proportion of question in top five category after 1998.
 
+Gods Zeus adn Athena were found consistenetly showing up in episods over time.
