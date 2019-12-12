@@ -55,13 +55,12 @@ Data were cleaned by separating the air date into day, year, and month columns t
 We visualized each of the top 5 categories using ggplot2. Within each year, the proportion of each of the categories was shown using a stacked bar chart.
 
 **Zeus and Athena prevalence**
-
 Our group was interested in looking at the prevalence of certain Greek gods over time, and we also incorporated Norse and Hindu gods as well to see if there was an overlap in categories that they occurred in. Ten of the most popular Greek, Norse, and Hindu gods were used to create separate lists. Str_detect was then used to detect these gods within either the question or answer columns, and all three resulting dataframes were merged together to create one dataframe with all questions/answers that mentioned any of the 15 gods. The merged dataframe was then used to explore the prevalence of 'Zeus' and 'Athena'. 
 
 **Software and packages**
 We used R free software version 3.6.0 for all of the analysis. R packages dplyr, ggplot2, stringr, tidyr, readr, lubridate, forcats, DT, plotly, knitr, and broom were used for analysis. 
 
-##### RESULT
+##### RESULTS
 
 ```{r}
 
@@ -120,7 +119,7 @@ kable(sea_98)
 
 ```
 
-Statistical test also showed the significant difference in the average number of questions asked before and after 1998 in the program.
+Statistical testing also showed the significant difference in the average number of questions asked before and after 1998 in the program.
 
 ```{r}
 # comparing differnece in question before and afte 1998
@@ -181,7 +180,7 @@ seasons_all_gods_zeusA <- seasons_all_gods %>%
 seasons_all_gods_ZA <- merge(merge(merge(seasons_all_gods_athenaQ, seasons_all_gods_athenaA, all = TRUE), seasons_all_gods_zeusQ, all = TRUE), seasons_all_gods_zeusA, all = TRUE)
 ```
 
-**Appearance of Zeus and Athena over episods**
+**Appearance of Zeus and Athena over seasons**
 
 The plot shows that both Zeus and Athena consistently show up in either the answer or question over time, with Athena appearing ~20 times while Zeus appeared ~33 times. While neither appear at all in some years, in others they appear as many as 5 times, with the most popularity within the late 90s and early 2000s. 
 
@@ -213,14 +212,19 @@ g
 ```
 
 ##### DISCUSSION
-We found american history, history, literature, science and sports as top category asked in Jeopardy all the season. Proportion of question in each top top category also seems varying in each season for example quesition in sports seems clear dropping. Beside this, overall, in all category questions seems huge droppping after year of 1998. It is difficult to answer why is happening this but possible hypothesis would be trying to make program interesting by incorporation of new categories with different interesting questions. For examples, the femine, the elephant etc. Participant may be smart on old categories. So, they came with new questions to ask. 
+We found american history, history, literature, science, and sports were the top 5 categories asked in Jeopardy when analyzing all of the seasons.
 
-We found that Zeus and Ahena consistently showing up in most of the episodes. Most dominant year was aroun 1996 to 2002. The plot shows that both Zeus and Athena consistently show up in either the answer or question over time, with Athena appearing ~20 times while Zeus appeared ~33 times. While neither appear at all in some years, in others they appear as many as 5 times, with the most popularity within the late 90s and early 2000s.
-Possilbe reasons..if any..
+The proportion of questions within each top top category also varied in each season. For example, questions within the sports category clearly dropped. An interesting trend was that there was a large drop in these top 5 categories after 1998. Although we are not sure why this occurred, it could be that Jeopardy was trying to make the show more interesting by adding new categories that could contain different types of questions. Furthermore, the reason could also have been to make the show more difficult if participants were too informed about the top 5 categories. 
+
+We found that Zeus and Athena consistently showed up within most seasons.
+They were most commonly found around the years 1996 to 2002. The plot shows that Zeus and Athena consistently show up in both the answer and question over time, with Athena appearing ~20 times while Zeus appeared ~33 times. 
+This could be because Zeus is involved in more stories in mythology then Athena and thus appeared more often. The popularity around the late 1990s/early 2000s could coincide with movies about mythology that were released around that time, such as 'The Odyssey' and Disney's 'Hercules'. 
 
 ##### CONCLUSION
-The american history, history, literature, science and sports as top category asked in Jeopardy all the season.
+American history, history, literature, science, and sports were the top 5 categories when analyzing all Jeopardy data. 
 
-There was clear drop in the relative proportion of question in top five category after 1998.
+There was clear drop in the relative proportion of questions within these top five categories after 1998.
 
-Gods Zeus adn Athena were found consistenetly showing up in episods over time.
+Popular Greek gods Zeus and Athena were found consistently showing up within each season over time. 
+
+
