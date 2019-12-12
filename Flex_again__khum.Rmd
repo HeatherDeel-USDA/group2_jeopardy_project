@@ -29,7 +29,8 @@ seasons_all_clean <- seasons_all %>%
   mutate(category = str_to_lower(string = category),
          answer = str_to_lower(string = answer),
          question = str_to_lower(string = question)) %>% 
-  filter(year != "2019")
+  filter(year != "2019") %>%
+  mutate(year=as.numeric(year))
 ```
 
 ```{r}
@@ -125,7 +126,8 @@ cat_pro <- seasons_all_clean %>%
   ggplot()+
   geom_bar(aes(x = year, y= freq, fill= category), stat="identity")+
   theme(axis.text.x = element_text(angle = 45))+
-  scale_x_discrete(breaks = seq(1984, 2018, 4))+
+  scale_x_continuous(breaks = seq(1984, 2018, 4))+
+  geom_vline(xintercept = 1998, color="red", linetype = "dashed")+
   #scale_y_continuous(labels=percent)+
   labs(x = "Year", y = "Proportion (%)") +
   theme_classic()
