@@ -104,13 +104,15 @@ color_pal <- c("grey75", "tomato1", "royalblue1")
 library(flexdashboard)
 ```
 
-Column {data-width=650}
+Column {data-width=400}
 -----------------------------------------------------------------------
 
-### Proportion of questions asked from the top five categories by season
+### Summary
 Our group was interested in looking at the proportions of the top categories from all seasons of Jeopardy. The below graph shows how the proportions of the top 5 categories changed per each year, with a steep drop around 1998. 
 The table shows the prevalence of all categories before and after 1998, as well as the proportions for each out of the total number of times that category appeared.
 Our group was then interested in analyzing how often popular Greek gods, Zeus and Athena, appeared over time. These data comprise how much 'Zeus' and 'Athena' appear in either the question or answer. This is out of a subset of Jeopardy data, created by pulling together rows that contain popular Greek, Norse, and Hindu gods. 
+
+### Proportion of questions asked from the top five categories by season
 ```{r}
 ### Top five categories of 
   
