@@ -13,6 +13,9 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, error = FA
 
 ##### INTRODUCTION
 
+General background about joepardy?
+What analysis could be interesting to them?
+
 When we load in the raw data, we found that a lot of categories keeps showing up within different seasons. Which makes us be curious about the frequency of how different categories show up, and what’s the top5 categories that show up in the most of times. And then there are some “biology ” in our group, and we are curious about the mythology topic, we want to explore that category in depth, then we decided to search for some god names, that would be fun. While we try to work on the top 5 categories, we found an interesting phenomenon that before and after 1998, there is a huge drop on the question numbers, which let us assume if there is any limitation happened since 1998, and we have a figure to show that interesting phenomenon.
 
 **Research questions**
@@ -130,12 +133,14 @@ kable(sea_98)
 
 
 ```
-Statistical test also shows the significant difference in the average number of questions asked before and after 1998 in the program.
+
+Statistical test also showed the significant difference in the average number of questions asked before and after 1998 in the program.
 
 ```{r}
 # comparing differnece in question before and afte 1998
 jeo_t <- t.test(sea_98$before_98, sea_98$after_98)
-tidy(jeo_t)
+t_tidy<-tidy(jeo_t)
+kable(t_tidy)
 ```
 
 
