@@ -21,7 +21,6 @@ library(scales)
 
 
 ```{r}
-
 seasons_all <- read_tsv("master_season1-35.tsv")
 seasons_all_clean <- seasons_all %>% 
   separate(air_date, sep="-", into = c("year", "month", "day")) %>% 
